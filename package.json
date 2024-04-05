@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "jest": "^29.7.0",
+    "node-notifier": "^10.0.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2"
+  },
+  "scripts": {
+    "test": "jest --detectOpenHandles"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12"
+  }
+}
