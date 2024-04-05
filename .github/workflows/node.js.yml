@@ -1,0 +1,50 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+
+  block_merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Check if branch is behind
+      id: check_behind
+      run: |
+        base_branch="main"
+        head_branch=$(jq -r '.pull_request.head.ref' "$GITHUB_EVENT_PATH")
+        git fetch origin "$base_branch"
+        ahead=$(git rev-list --count origin/"$base_branch".."$head_branch")
+        if [ "$ahead" -gt 0 ]; then
+          echo "::error::Branch $head_branch is ahead of $base_branch by $ahead commits. Merge is not allowed."
+          exit 1
+        fi
+
+    - name: Block merge if behind
+      if: steps.check_behind.outcome == 'failure'
+      run: exit 1
