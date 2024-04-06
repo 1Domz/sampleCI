@@ -25,7 +25,7 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
 
-    trigger_workflow:
+  trigger_workflow:
     if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
     runs-on: ubuntu-latest
 
@@ -40,7 +40,6 @@ jobs:
       run: |
         # Add your custom logic here
         echo "Pull request is approved, triggering workflow..."
-
 
   block_merge:
     runs-on: ubuntu-latest
