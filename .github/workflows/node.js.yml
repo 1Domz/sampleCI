@@ -17,40 +17,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16.x'
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
 
   trigger_workflow:
     if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
     runs-on: ubuntu-latest
-
    
   block_merge:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Check if branch is behind
-      id: check_behind
-      run: |
-        base_branch="main"
-        head_branch=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/refs\/heads\///')
-        git fetch origin "$base_branch"
-        ahead=$(git rev-list --count "origin/$base_branch".."$head_branch" || echo "0")
-        if [ "$ahead" -gt 0 ]; then
-          echo "::error::Branch $head_branch is ahead of $base_branch by $ahead commits. Merge is not allowed."
-          exit 1
-        fi
+      - name: Check if branch is behind
+        id: check_behind
+        run: |
+          base_branch="main"
+          head_branch=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/refs\/heads\///')
+          git fetch origin "$base_branch"
+          ahead=$(git rev-list --count "origin/$base_branch".."$head_branch" || echo "0")
+          if [ "$ahead" -gt 0 ]; then
+            echo "::error::Branch $head_branch is ahead of $base_branch by $ahead commits. Merge is not allowed."
+            exit 1
+          fi
 
-    - name: Block merge if behind
-      if: steps.check_behind.outcome == 'failure'
-      run: exit 1
+      - name: Block merge if behind
+        if: steps.check_behind.outcome == 'failure'
+        run: exit 1
