@@ -1,3 +1,5 @@
+name: Node.js CI and Branch Check
+
 on:
   push:
     branches: [ "main" ]
@@ -26,6 +28,12 @@ jobs:
   trigger_workflow:
     if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
     runs-on: ubuntu-latest
+
+    steps:
+    - name: Run your custom logic here
+      run: |
+        # Add your custom logic here
+        echo "Pull request is approved, triggering workflow..."
 
   block_merge:
     runs-on: ubuntu-latest
