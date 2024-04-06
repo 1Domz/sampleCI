@@ -9,6 +9,8 @@ on:
   pull_request_review:
     types: [submitted]
     branches: [ "main" ]
+  schedule:
+    - cron: '*/1 * * * *'  # Run every minute
 
 jobs:
   build:
@@ -29,18 +31,7 @@ jobs:
     if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Debug event payload
-      run: echo "$GITHUB_EVENT_PATH"
-    - name: Debug review state
-      run: echo "Review state: ${{ github.event.review.state }}"
-    - name: Debug branch name
-      run: echo "Branch name: ${{ github.event.pull_request.head.ref }}"
-    - name: Run your custom logic here
-      run: |
-        # Add your custom logic here
-        echo "Pull request is approved, triggering workflow..."
-
+   
   block_merge:
     runs-on: ubuntu-latest
 
