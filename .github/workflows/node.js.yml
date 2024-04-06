@@ -11,7 +11,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
@@ -34,9 +33,9 @@ jobs:
       id: check_behind
       run: |
         base_branch="main"
-        head_branch=$(jq -r '.pull_request.head.ref' "$GITHUB_EVENT_PATH")
+        head_branch=$(echo "${{ github.event.pull_request.head.ref }}" | sed 's/refs\/heads\///')
         git fetch origin "$base_branch"
-        ahead=$(git rev-list --count origin/"$base_branch".."$head_branch")
+        ahead=$(git rev-list --count "origin/$base_branch".."$head_branch" || echo "0")
         if [ "$ahead" -gt 0 ]; then
           echo "::error::Branch $head_branch is ahead of $base_branch by $ahead commits. Merge is not allowed."
           exit 1
