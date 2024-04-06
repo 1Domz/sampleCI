@@ -9,6 +9,8 @@ on:
   pull_request_review:
     types: [submitted]
     branches: [ "main" ]
+  schedule:
+    - cron: '*/1 * * * *'  # Run every minute
 
 jobs:
   build:
